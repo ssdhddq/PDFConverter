@@ -8,6 +8,7 @@
 import UIKit
 
 class PhotoPickerViewController: UIViewController {
+    
     private let selectButton: UIButton = {
         let btn = UIButton()
         btn.setTitle("Выбрать фото", for: .normal)
