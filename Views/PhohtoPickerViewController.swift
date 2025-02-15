@@ -6,8 +6,11 @@
 //
 
 import UIKit
+import PhotosUI
 
 class PhotoPickerViewController: UIViewController {
+    private let pickerViewModel = PhotoPickerViewModel()
+    private let converterViewModel = PDFConverterViewModel()
     
     private let selectButton: UIButton = {
         let btn = UIButton()
@@ -44,6 +47,8 @@ class PhotoPickerViewController: UIViewController {
     }
     
     private func setupUI() {
+        view.backgroundColor = .gray
+        
         view.addSubview(vStack)
         
         NSLayoutConstraint.activate([
@@ -53,10 +58,12 @@ class PhotoPickerViewController: UIViewController {
     }
     
     @objc private func selectPhoto() {
-        
+        pickerViewModel.pickImages(from: self)
     }
     
     @objc private func convertToPDF() {
-        
+        guard let pdfURL = converterViewModel.generatePDF(from: pickerViewModel.photoModel.images) else {return}
+        let previewVC = PDFPreviewViewController(pdfURL: pdfURL)
+        navigationController?.pushViewController(previewVC, animated: true)
     }
 }
