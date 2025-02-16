@@ -14,7 +14,19 @@ class PhotoPickerViewController: UIViewController {
     
     private let selectButton: UIButton = {
         let btn = UIButton()
+        btn.backgroundColor = .clear
         btn.setTitle("Выбрать фото", for: .normal)
+        btn.titleLabel?.textColor = .appBlack
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        
+        return btn
+    }()
+    
+    private let clearSelectedButton: UIButton = {
+        let btn = UIButton()
+        btn.backgroundColor = .clear
+        btn.setTitle("Очистить выбор", for: .normal)
+        btn.titleLabel?.textColor = .red
         btn.translatesAutoresizingMaskIntoConstraints = false
         
         return btn
@@ -22,14 +34,18 @@ class PhotoPickerViewController: UIViewController {
     
     private let convertButton: UIButton = {
         let btn = UIButton()
+        btn.backgroundColor = .clear
         btn.setTitle("Конвертировать в PDF", for: .normal)
+        btn.titleLabel?.textColor = .appBlack
         btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.isEnabled = false
+        btn.alpha = 0.3
         
         return btn
     }()
     
     private lazy var vStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [selectButton, convertButton])
+        let stack = UIStackView(arrangedSubviews: [selectButton, clearSelectedButton, convertButton])
         stack.axis = .vertical
         stack.spacing = 16
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -43,11 +59,14 @@ class PhotoPickerViewController: UIViewController {
         setupUI()
         
         selectButton.addTarget(self, action: #selector(selectPhoto), for: .touchUpInside)
+        clearSelectedButton.addTarget(self, action: #selector(clearImages), for: .touchUpInside)
         convertButton.addTarget(self, action: #selector(convertToPDF), for: .touchUpInside)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(enableConvertButton), name: NSNotification.Name("ImagesUpdated"), object: nil)
     }
     
     private func setupUI() {
-        view.backgroundColor = .gray
+        view.backgroundColor = .appBlack
         
         view.addSubview(vStack)
         
@@ -61,9 +80,22 @@ class PhotoPickerViewController: UIViewController {
         pickerViewModel.pickImages(from: self)
     }
     
+    @objc private func clearImages() {
+        pickerViewModel.photoModel.images = []
+        convertButton.isEnabled = false
+        convertButton.alpha = 0.3
+    }
+    
     @objc private func convertToPDF() {
         guard let pdfURL = converterViewModel.generatePDF(from: pickerViewModel.photoModel.images) else {return}
         let previewVC = PDFPreviewViewController(pdfURL: pdfURL)
         navigationController?.pushViewController(previewVC, animated: true)
+    }
+    
+    @objc private func enableConvertButton() {
+        if !pickerViewModel.photoModel.images.isEmpty {
+            self.convertButton.isEnabled = true
+            self.convertButton.alpha = 1
+        }
     }
 }
