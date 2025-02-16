@@ -31,6 +31,8 @@ extension PhotoPickerViewModel: PHPickerViewControllerDelegate {
                 if let image = image as? UIImage {
                     DispatchQueue.main.async {
                         self?.photoModel.images.append(image)
+                        
+                        NotificationCenter.default.post(name: NSNotification.Name("ImagesUpdated"), object: nil)
                     }
                 }
             }
