@@ -33,14 +33,23 @@ class PDFPreviewViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Поделиться", style: .plain, target: self, action: #selector(sharePDF))
+        
+        let shareButton = UIBarButtonItem(
+            image: UIImage(systemName: "square.and.arrow.up"),
+            style: .plain,
+            target: self,
+            action: #selector(sharePDF)
+        )
+        navigationItem.rightBarButtonItem = shareButton
+        
+        title = "Предпросмотр PDF"
     }
     
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
         view.addSubview(pdfView)
+        pdfView.backgroundColor = .secondarySystemBackground
         
         NSLayoutConstraint.activate([
             pdfView.leadingAnchor.constraint(equalTo: view.leadingAnchor),

@@ -13,43 +13,47 @@ class PhotoPickerViewController: UIViewController {
     private let converterViewModel = PDFConverterViewModel()
     
     private let selectButton: UIButton = {
-        let btn = UIButton()
-        btn.backgroundColor = .clear
-        btn.setTitle("Выбрать фото", for: .normal)
-        btn.titleLabel?.textColor = .appBlack
+        let btn = UIButton(configuration: .filled())
+        btn.configuration?.baseBackgroundColor = .systemBlue
+        btn.configuration?.cornerStyle = .large
+        btn.configuration?.title = "Выбрать фото"
         btn.translatesAutoresizingMaskIntoConstraints = false
-        
         return btn
     }()
     
     private let clearSelectedButton: UIButton = {
-        let btn = UIButton()
-        btn.backgroundColor = .clear
-        btn.setTitle("Очистить выбор", for: .normal)
-        btn.titleLabel?.textColor = .red
+        let btn = UIButton(configuration: .plain())
+        btn.configuration?.baseForegroundColor = .systemRed
+        btn.configuration?.title = "Очистить выбор"
         btn.translatesAutoresizingMaskIntoConstraints = false
-        
         return btn
     }()
     
     private let convertButton: UIButton = {
-        let btn = UIButton()
-        btn.backgroundColor = .clear
-        btn.setTitle("Конвертировать в PDF", for: .normal)
-        btn.titleLabel?.textColor = .appBlack
+        let btn = UIButton(configuration: .filled())
+        btn.configuration?.baseBackgroundColor = .systemGreen
+        btn.configuration?.cornerStyle = .large
+        btn.configuration?.title = "Конвертировать в PDF"
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.isEnabled = false
-        btn.alpha = 0.3
-        
         return btn
     }()
     
+    private let selectedImagesLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.textColor = .secondaryLabel
+        label.font = .systemFont(ofSize: 17, weight: .medium)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Выбрано фото: 0"
+        return label
+    }()
+    
     private lazy var vStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [selectButton, clearSelectedButton, convertButton])
+        let stack = UIStackView(arrangedSubviews: [selectedImagesLabel, selectButton, clearSelectedButton, convertButton])
         stack.axis = .vertical
         stack.spacing = 16
         stack.translatesAutoresizingMaskIntoConstraints = false
-        
         return stack
     }()
     
@@ -66,14 +70,20 @@ class PhotoPickerViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = .appBlack
+        view.backgroundColor = .systemBackground
         
         view.addSubview(vStack)
         
         NSLayoutConstraint.activate([
             vStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             vStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            vStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            vStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24)
         ])
+        
+        [selectButton, convertButton].forEach { button in
+            button.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        }
     }
     
     @objc private func selectPhoto() {
@@ -83,7 +93,7 @@ class PhotoPickerViewController: UIViewController {
     @objc private func clearImages() {
         pickerViewModel.photoModel.images = []
         convertButton.isEnabled = false
-        convertButton.alpha = 0.3
+        selectedImagesLabel.text = "Выбрано фото: 0"
     }
     
     @objc private func convertToPDF() {
@@ -95,7 +105,7 @@ class PhotoPickerViewController: UIViewController {
     @objc private func enableConvertButton() {
         if !pickerViewModel.photoModel.images.isEmpty {
             self.convertButton.isEnabled = true
-            self.convertButton.alpha = 1
+            selectedImagesLabel.text = "Выбрано фото: \(pickerViewModel.photoModel.images.count)"
         }
     }
 }
